@@ -371,13 +371,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 const windowHeight = window.innerHeight;
                 const startOffset = windowHeight + 100; // 从视口下方100px开始
                 const currentOffset = startOffset * (1 - easedProgress);
-                let liftOffset = 0;
-                if (scrollPercent >= 0.65) {
-                    const liftProgress = Math.min((scrollPercent - 0.65) / 0.35, 1);
-                    liftOffset = liftProgress * 500; // 向上偏移
-                }
-                const finalOffset = currentOffset - liftOffset;
-                thirdLine.style.transform = `translateY(${finalOffset}px)`;
+                thirdLine.style.transform = `translateY(${currentOffset}px)`;
                 thirdLine.style.transition = 'none'; // 禁用transition，让动画跟随滚动
             }
         } else {
@@ -402,13 +396,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 const windowHeight = window.innerHeight;
                 const startOffset = windowHeight + 100;
                 const currentOffset = startOffset * (1 - easedPhoto);
-                let liftOffset = 0;
-                if (scrollPercent >= 0.7) {
-                    const liftProgress = Math.min((scrollPercent - 0.7) / 0.3, 1);
-                    liftOffset = liftProgress * 400;
-                }
-                const finalOffset = currentOffset - liftOffset;
-                personalPhoto.style.transform = `translateY(${finalOffset}px)`;
+                personalPhoto.style.transform = `translateY(${currentOffset}px)`;
                 personalPhoto.style.transition = 'none';
             }
         } else if (personalPhoto) {
