@@ -200,6 +200,10 @@ window.addEventListener('DOMContentLoaded', function() {
         }, 600); // 等待移动动画完成
     }, 2000); // 2秒后开始移动（匹配闪烁动画时间）
     
+    // 滚动速率限制（50%）
+    const scrollSpeedFactor = 0.5;
+    let targetScrollTop = 0;
+    
     // 在滚动启用前阻止所有滚动尝试
     const preventScroll = (e) => {
         if (!document.body.classList.contains('scroll-enabled')) {
@@ -209,11 +213,86 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     };
     
+    // 限制滚动速率
+    let lastTouchY = 0;
+    let isTouching = false;
+    
+    const handleWheel = (e) => {
+        if (!document.body.classList.contains('scroll-enabled')) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        
+        // 计算目标滚动位置（50%速率）
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        const deltaY = e.deltaY;
+        const reducedDelta = deltaY * scrollSpeedFactor;
+        targetScrollTop = Math.max(0, Math.min(
+            document.documentElement.scrollHeight - window.innerHeight,
+            currentScroll + reducedDelta
+        ));
+        
+        e.preventDefault();
+        window.scrollTo({
+            top: targetScrollTop,
+            behavior: 'auto'
+        });
+    };
+    
+    // 处理触摸滚动
+    const handleTouchStart = (e) => {
+        if (!document.body.classList.contains('scroll-enabled')) {
+            e.preventDefault();
+            return false;
+        }
+        lastTouchY = e.touches[0].clientY;
+        isTouching = true;
+    };
+    
+    const handleTouchMove = (e) => {
+        if (!document.body.classList.contains('scroll-enabled')) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        
+        if (!isTouching) return;
+        
+        const currentTouchY = e.touches[0].clientY;
+        const deltaY = lastTouchY - currentTouchY;
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        const reducedDelta = deltaY * scrollSpeedFactor;
+        
+        targetScrollTop = Math.max(0, Math.min(
+            document.documentElement.scrollHeight - window.innerHeight,
+            currentScroll + reducedDelta
+        ));
+        
+        e.preventDefault();
+        window.scrollTo({
+            top: targetScrollTop,
+            behavior: 'auto'
+        });
+        
+        lastTouchY = currentTouchY;
+    };
+    
+    const handleTouchEnd = () => {
+        isTouching = false;
+    };
+    
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
     // 滚动时逐渐隐藏所有文字（Hi, I'm ISO.Hi），然后在左上角显示 ISO.Hi
     const isoCorner = document.getElementById('isoCorner');
     const thirdLine = document.getElementById('thirdLine');
     const personalPhoto = document.getElementById('personalPhoto');
     const backgroundImageLayer = document.getElementById('backgroundImageLayer');
+    const continueScroll = document.getElementById('continueScroll');
     const fadeStart = 100; // 开始淡出的滚动位置（像素）
     const fadeEnd = 400; // 完全消失的滚动位置（像素）
     const cornerShowStart = 300; // 开始显示左上角ISO.Hi的滚动位置（像素）
@@ -223,7 +302,7 @@ window.addEventListener('DOMContentLoaded', function() {
             return; // 如果滚动未启用，直接返回
         }
         
-        if (!thirdLine && !personalPhoto) {
+        if (!thirdLine && !personalPhoto && !continueScroll) {
             return; // 如果展示元素不存在，直接返回
         }
         
@@ -292,7 +371,13 @@ window.addEventListener('DOMContentLoaded', function() {
                 const windowHeight = window.innerHeight;
                 const startOffset = windowHeight + 100; // 从视口下方100px开始
                 const currentOffset = startOffset * (1 - easedProgress);
-                thirdLine.style.transform = `translateY(${currentOffset}px)`;
+                let liftOffset = 0;
+                if (scrollPercent >= 0.65) {
+                    const liftProgress = Math.min((scrollPercent - 0.65) / 0.35, 1);
+                    liftOffset = liftProgress * 500; // 向上偏移
+                }
+                const finalOffset = currentOffset - liftOffset;
+                thirdLine.style.transform = `translateY(${finalOffset}px)`;
                 thirdLine.style.transition = 'none'; // 禁用transition，让动画跟随滚动
             }
         } else {
@@ -317,7 +402,13 @@ window.addEventListener('DOMContentLoaded', function() {
                 const windowHeight = window.innerHeight;
                 const startOffset = windowHeight + 100;
                 const currentOffset = startOffset * (1 - easedPhoto);
-                personalPhoto.style.transform = `translateY(${currentOffset}px)`;
+                let liftOffset = 0;
+                if (scrollPercent >= 0.7) {
+                    const liftProgress = Math.min((scrollPercent - 0.7) / 0.3, 1);
+                    liftOffset = liftProgress * 400;
+                }
+                const finalOffset = currentOffset - liftOffset;
+                personalPhoto.style.transform = `translateY(${finalOffset}px)`;
                 personalPhoto.style.transition = 'none';
             }
         } else if (personalPhoto) {
@@ -325,6 +416,15 @@ window.addEventListener('DOMContentLoaded', function() {
             const windowHeight = window.innerHeight;
             personalPhoto.style.transform = `translateY(${windowHeight + 100}px)`;
             personalPhoto.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+        }
+        
+        // 控制“Continue to scroll”提示的显示
+        if (continueScroll) {
+            if (scrollPercent >= 0.6) {
+                continueScroll.classList.add('visible');
+            } else {
+                continueScroll.classList.remove('visible');
+            }
         }
     };
     
