@@ -200,10 +200,6 @@ window.addEventListener('DOMContentLoaded', function() {
         }, 600); // 等待移动动画完成
     }, 2000); // 2秒后开始移动（匹配闪烁动画时间）
     
-    // 滚动速率限制（50%）
-    const scrollSpeedFactor = 0.5;
-    let targetScrollTop = 0;
-    
     // 在滚动启用前阻止所有滚动尝试
     const preventScroll = (e) => {
         if (!document.body.classList.contains('scroll-enabled')) {
@@ -212,80 +208,6 @@ window.addEventListener('DOMContentLoaded', function() {
             return false;
         }
     };
-    
-    // 限制滚动速率
-    let lastTouchY = 0;
-    let isTouching = false;
-    
-    const handleWheel = (e) => {
-        if (!document.body.classList.contains('scroll-enabled')) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-        
-        // 计算目标滚动位置（50%速率）
-        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-        const deltaY = e.deltaY;
-        const reducedDelta = deltaY * scrollSpeedFactor;
-        targetScrollTop = Math.max(0, Math.min(
-            document.documentElement.scrollHeight - window.innerHeight,
-            currentScroll + reducedDelta
-        ));
-        
-        e.preventDefault();
-        window.scrollTo({
-            top: targetScrollTop,
-            behavior: 'auto'
-        });
-    };
-    
-    // 处理触摸滚动
-    const handleTouchStart = (e) => {
-        if (!document.body.classList.contains('scroll-enabled')) {
-            e.preventDefault();
-            return false;
-        }
-        lastTouchY = e.touches[0].clientY;
-        isTouching = true;
-    };
-    
-    const handleTouchMove = (e) => {
-        if (!document.body.classList.contains('scroll-enabled')) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-        
-        if (!isTouching) return;
-        
-        const currentTouchY = e.touches[0].clientY;
-        const deltaY = lastTouchY - currentTouchY;
-        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-        const reducedDelta = deltaY * scrollSpeedFactor;
-        
-        targetScrollTop = Math.max(0, Math.min(
-            document.documentElement.scrollHeight - window.innerHeight,
-            currentScroll + reducedDelta
-        ));
-        
-        e.preventDefault();
-        window.scrollTo({
-            top: targetScrollTop,
-            behavior: 'auto'
-        });
-        
-        lastTouchY = currentTouchY;
-    };
-    
-    const handleTouchEnd = () => {
-        isTouching = false;
-    };
-    
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: false });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: false });
     
     // 滚动时逐渐隐藏所有文字（Hi, I'm ISO.Hi），然后在左上角显示 ISO.Hi
     const isoCorner = document.getElementById('isoCorner');
