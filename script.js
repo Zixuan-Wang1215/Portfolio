@@ -290,6 +290,7 @@ window.addEventListener('DOMContentLoaded', function() {
     // 滚动时逐渐隐藏所有文字（Hi, I'm ISO.Hi），然后在左上角显示 ISO.Hi
     const isoCorner = document.getElementById('isoCorner');
     const thirdLine = document.getElementById('thirdLine');
+    const personalPhoto = document.getElementById('personalPhoto');
     const backgroundImageLayer = document.getElementById('backgroundImageLayer');
     const fadeStart = 100; // 开始淡出的滚动位置（像素）
     const fadeEnd = 400; // 完全消失的滚动位置（像素）
@@ -300,8 +301,8 @@ window.addEventListener('DOMContentLoaded', function() {
             return; // 如果滚动未启用，直接返回
         }
         
-        if (!thirdLine) {
-            return; // 如果 thirdLine 元素不存在，直接返回
+        if (!thirdLine && !personalPhoto) {
+            return; // 如果展示元素不存在，直接返回
         }
         
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -368,7 +369,6 @@ window.addEventListener('DOMContentLoaded', function() {
                 // 从最底部（视口高度+100px）移动到目标位置（0）
                 const windowHeight = window.innerHeight;
                 const startOffset = windowHeight + 100; // 从视口下方100px开始
-                const endOffset = 0; // 目标位置
                 const currentOffset = startOffset * (1 - easedProgress);
                 thirdLine.style.transform = `translateY(${currentOffset}px)`;
                 thirdLine.style.transition = 'none'; // 禁用transition，让动画跟随滚动
@@ -381,6 +381,28 @@ window.addEventListener('DOMContentLoaded', function() {
                 thirdLine.style.transform = `translateY(${windowHeight + 100}px)`;
                 thirdLine.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
             }
+        }
+        
+        // 在滚动到50%位置开始显示个人照片（在右侧）
+        if (scrollPercent >= 0.5) {
+            const photoProgress = Math.min((scrollPercent - 0.5) / 0.5, 1);
+            const easedPhoto = photoProgress < 0.5
+                ? 4 * photoProgress * photoProgress * photoProgress
+                : 1 - Math.pow(-2 * photoProgress + 2, 3) / 2;
+            
+            if (personalPhoto) {
+                personalPhoto.style.opacity = easedPhoto;
+                const windowHeight = window.innerHeight;
+                const startOffset = windowHeight + 100;
+                const currentOffset = startOffset * (1 - easedPhoto);
+                personalPhoto.style.transform = `translateY(${currentOffset}px)`;
+                personalPhoto.style.transition = 'none';
+            }
+        } else if (personalPhoto) {
+            personalPhoto.style.opacity = 0;
+            const windowHeight = window.innerHeight;
+            personalPhoto.style.transform = `translateY(${windowHeight + 100}px)`;
+            personalPhoto.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
         }
     };
     

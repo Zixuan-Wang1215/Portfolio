@@ -118,7 +118,7 @@ body.scroll-enabled {
 
 .third-line-container {
     position: fixed;
-    bottom: 150px;
+    bottom: 100px;
     left: 50px;
     width: calc(100% - 100px);
     display: flex;
@@ -138,6 +138,39 @@ body.scroll-enabled {
     transform: translateY(100vh);
     color: #cccccc;
     transition: none;
+}
+
+.personal-photo-container {
+    position: fixed;
+    bottom: 150px;
+    right: 130px;
+    width: min(28vw, 360px);
+    aspect-ratio: 3 / 4;
+    opacity: 0;
+    transform: translateY(100vh);
+    transition: none;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.personal-photo-container img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
+}
+
+.personal-photo-container img.personal-photo-bg {
+    filter: brightness(0.85);
+}
+
+.personal-photo-container img.personal-photo-foreground {
+    mix-blend-mode: normal;
 }
 
 .third-line p {
