@@ -181,6 +181,20 @@ body.scroll-enabled {
     margin-bottom: 0;
 }
 
+@media (orientation: landscape) {
+    .third-line-container {
+        bottom: 12vh;
+        left: 6vw;
+        width: calc(100% - 12vw);
+    }
+    
+    .personal-photo-container {
+        bottom: 12vh;
+        right: 6vw;
+        width: min(24vw, 320px);
+    }
+}
+
 .hi-text.breathing {
     animation: breathe 1s ease-in-out 2;
 }
