@@ -200,92 +200,7 @@ window.addEventListener('DOMContentLoaded', function() {
         }, 600); // 等待移动动画完成
     }, 2000); // 2秒后开始移动（匹配闪烁动画时间）
     
-    // 滚动速率限制（50%）
-    const scrollSpeedFactor = 0.5;
-    let targetScrollTop = 0;
-    
-    // 在滚动启用前阻止所有滚动尝试
-    const preventScroll = (e) => {
-        if (!document.body.classList.contains('scroll-enabled')) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    };
-    
-    // 限制滚动速率
-    let lastTouchY = 0;
-    let isTouching = false;
-    
-    const handleWheel = (e) => {
-        if (!document.body.classList.contains('scroll-enabled')) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-        
-        // 计算目标滚动位置（50%速率）
-        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-        const deltaY = e.deltaY;
-        const reducedDelta = deltaY * scrollSpeedFactor;
-        targetScrollTop = Math.max(0, Math.min(
-            document.documentElement.scrollHeight - window.innerHeight,
-            currentScroll + reducedDelta
-        ));
-        
-        e.preventDefault();
-        window.scrollTo({
-            top: targetScrollTop,
-            behavior: 'auto'
-        });
-    };
-    
-    // 处理触摸滚动
-    const handleTouchStart = (e) => {
-        if (!document.body.classList.contains('scroll-enabled')) {
-            e.preventDefault();
-            return false;
-        }
-        lastTouchY = e.touches[0].clientY;
-        isTouching = true;
-    };
-    
-    const handleTouchMove = (e) => {
-        if (!document.body.classList.contains('scroll-enabled')) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-        
-        if (!isTouching) return;
-        
-        const currentTouchY = e.touches[0].clientY;
-        const deltaY = lastTouchY - currentTouchY;
-        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-        const reducedDelta = deltaY * scrollSpeedFactor;
-        
-        targetScrollTop = Math.max(0, Math.min(
-            document.documentElement.scrollHeight - window.innerHeight,
-            currentScroll + reducedDelta
-        ));
-        
-        e.preventDefault();
-        window.scrollTo({
-            top: targetScrollTop,
-            behavior: 'auto'
-        });
-        
-        lastTouchY = currentTouchY;
-    };
-    
-    const handleTouchEnd = () => {
-        isTouching = false;
-    };
-    
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: false });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: false });
+    // 滚动速率限制（50%）- 已移除以优化性能
     
     // 滚动时逐渐隐藏所有文字（Hi, I'm ISO.Hi），然后在左上角显示 ISO.Hi
     const isoCorner = document.getElementById('isoCorner');
@@ -414,8 +329,153 @@ window.addEventListener('DOMContentLoaded', function() {
                 continueScroll.classList.remove('visible');
             }
         }
+
+        // Fade out fixed elements when content section approaches
+        const contentSection = document.querySelector('.content-section');
+        if (contentSection) {
+            const rect = contentSection.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const triggerPoint = windowHeight * 0.8;
+            
+            if (rect.top < triggerPoint) {
+                const fadeOutFactor = Math.max(0, Math.min(1, (triggerPoint - rect.top) / (windowHeight * 0.5)));
+                const opacityMultiplier = 1 - fadeOutFactor;
+                
+                if (thirdLine) {
+                    const currentOpacity = parseFloat(thirdLine.style.opacity) || 0;
+                    thirdLine.style.opacity = currentOpacity * opacityMultiplier;
+                }
+                
+                if (personalPhoto) {
+                    const currentOpacity = parseFloat(personalPhoto.style.opacity) || 0;
+                    personalPhoto.style.opacity = currentOpacity * opacityMultiplier;
+                }
+                
+                if (continueScroll) {
+                    continueScroll.classList.remove('visible');
+                }
+            }
+        }
     };
     
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', () => {
+        requestAnimationFrame(handleScroll);
+    });
+
+    // Render Gallery
+    renderGallery();
 });
+
+const albums = [
+    {
+        title: "2022.07 Guiyang",
+        cover: "src/2022.07 Guiyang/Weixin Image_20251031224104_69_11.jpg",
+        folder: "src/2022.07 Guiyang/"
+    },
+    {
+        title: "2023.08 LA",
+        cover: "src/2023.08 LA/D75_5760.jpg",
+        folder: "src/2023.08 LA/"
+    },
+    {
+        title: "2023.10 Guilin",
+        cover: "src/2023.10 Guilin/D75_9835.jpg",
+        folder: "src/2023.10 Guilin/"
+    },
+    {
+        title: "2024.05 F1",
+        cover: "src/2024.05 F1/10-WechatIMG526.jpg",
+        folder: "src/2024.05 F1/"
+    },
+    {
+        title: "2024.05 Shenzhen",
+        cover: "src/2024.05 Shenzhen/IMG_20240512_181735-2.jpg",
+        folder: "src/2024.05 Shenzhen/"
+    },
+    {
+        title: "2024.06 Shanghai",
+        cover: "src/2024.06 Shanghai/D75_2338.jpg",
+        folder: "src/2024.06 Shanghai/"
+    },
+    {
+        title: "2024.07 Philly",
+        cover: "src/2024.07 Philly/D75_3514.jpg",
+        folder: "src/2024.07 Philly/"
+    },
+    {
+        title: "2024.08 Plane spotting",
+        cover: "src/2024.08 Plane spotting/D75_5282.jpg",
+        folder: "src/2024.08 Plane spotting/"
+    },
+    {
+        title: "2024.12 Christmas",
+        cover: "src/2024.12 Christmas/9583963_9583963-R1-023-10.jpg",
+        folder: "src/2024.12 Christmas/"
+    },
+    {
+        title: "2025.03 Skiweek",
+        cover: "src/2025.03 Skiweek/D75_8314.jpg",
+        folder: "src/2025.03 Skiweek/"
+    },
+    {
+        title: "2025.05 Ferrari",
+        cover: "src/2025.05 Ferrari/12-IMG_9645.jpg",
+        folder: "src/2025.05 Ferrari/"
+    },
+    {
+        title: "2025.06 Amtrak",
+        cover: "src/2025.06 Amtrak/D75_8350.jpg",
+        folder: "src/2025.06 Amtrak/"
+    },
+    {
+        title: "2025.07 Pittsburgh",
+        cover: "src/2025.07 Pittsburgh/D75_7631.jpg",
+        folder: "src/2025.07 Pittsburgh/"
+    },
+    {
+        title: "2025.10 Fleetweek",
+        cover: "src/2025.10 Fleetweek/D75_8798-2.jpg",
+        folder: "src/2025.10 Fleetweek/"
+    },
+    {
+        title: "The \"Absurd\"",
+        cover: "src/The \"Absurd\"/D75_4010.jpg",
+        folder: "src/The \"Absurd\"/"
+    }
+];
+
+function renderGallery() {
+    const contentSection = document.querySelector('.content-section');
+    if (!contentSection) return;
+
+    // Clear placeholder
+    contentSection.innerHTML = '';
+
+    const galleryContainer = document.createElement('div');
+    galleryContainer.className = 'gallery-container';
+
+    albums.forEach(album => {
+        const albumCard = document.createElement('div');
+        albumCard.className = 'album-card';
+        
+        const img = document.createElement('img');
+        img.src = album.cover;
+        img.alt = album.title;
+        img.loading = 'lazy';
+        
+        const info = document.createElement('div');
+        info.className = 'album-info';
+        
+        const title = document.createElement('h3');
+        title.textContent = album.title;
+        
+        info.appendChild(title);
+        albumCard.appendChild(img);
+        albumCard.appendChild(info);
+        
+        galleryContainer.appendChild(albumCard);
+    });
+
+    contentSection.appendChild(galleryContainer);
+}
 

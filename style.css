@@ -33,6 +33,7 @@ body.scroll-enabled {
     opacity: 0.3;
     pointer-events: none;
     transition: opacity 0.8s ease-out;
+    will-change: opacity;
 }
 
 #backgroundCanvas {
@@ -81,17 +82,20 @@ body.scroll-enabled {
     display: inline-block;
     opacity: 1;
     transition: opacity 0.8s ease-out;
+    will-change: opacity;
 }
 
 .im-text {
     display: inline-block;
     opacity: 1;
     transition: opacity 0.8s ease-out;
+    will-change: opacity;
 }
 
 .iso-text {
     display: inline-block;
     transition: opacity 0.8s ease-out;
+    will-change: opacity;
 }
 
 /* 左上角的 ISO.Hi */
@@ -114,6 +118,8 @@ body.scroll-enabled {
 .content-section {
     position: relative;
     z-index: 1;
+    padding-top: 100vh !important; /* Push gallery down to allow "About Me" animation */
+    background: linear-gradient(to bottom, transparent, #000000 20%); /* Smooth transition */
 }
 
 .third-line-container {
@@ -138,6 +144,7 @@ body.scroll-enabled {
     transform: translateY(100vh);
     color: #cccccc;
     transition: none;
+    will-change: opacity, transform;
 }
 
 .personal-photo-container {
@@ -154,6 +161,7 @@ body.scroll-enabled {
     align-items: center;
     justify-content: center;
     z-index: 100;
+    will-change: opacity, transform;
 }
 
 .personal-photo-container img {
@@ -330,5 +338,60 @@ body.scroll-enabled {
     .main-statement {
         font-size: 1rem;
     }
+}
+
+/* Gallery Styles */
+.gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.album-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 3/2;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.album-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.album-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.album-card:hover img {
+    transform: scale(1.05);
+}
+
+.album-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: white;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+
+.album-info h3 {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 0.05em;
 }
 
